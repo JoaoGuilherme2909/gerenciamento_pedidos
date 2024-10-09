@@ -2,6 +2,9 @@
 using gerenciamento_pedidos.api.Data;
 using gerenciamento_pedidos.api.Dtos.Product;
 using gerenciamento_pedidos.api.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace gerenciamento_pedidos.api.Services;
@@ -16,7 +19,7 @@ public class ProductService
         _mapper = mapper;
     }
 
-    public async Task<SelectProductDto> CreateProduct(CreateProductDto productDto)
+    public async Task CreateProduct(CreateProductDto productDto)
     {
         var produto = await _appDbContext.Products
             .FirstOrDefaultAsync(p => 
@@ -31,13 +34,11 @@ public class ProductService
         var produtoCriado = await _appDbContext.AddAsync(_mapper.Map<Product>(productDto));
 
         await _appDbContext.SaveChangesAsync();
-
-        return _mapper.Map<SelectProductDto>(produtoCriado);
     }
 
     public async Task<ICollection<SelectProductDto>> SelectAllProducts()
     {
-        var produtos = await _appDbContext.Products.ToListAsync();
+        var produtos = await _appDbContext.Products.Where(p => p.Active == true).ToListAsync();
         return produtos.Select(p => _mapper.Map<SelectProductDto>(p)).ToList();
     }
 
@@ -53,26 +54,40 @@ public class ProductService
     
     }
 
-    public async Task ToogleActiveProduct(Guid id)
+    private async Task<Product> SelectProductById(Guid id)
     {
-        var produto = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);   
-        
-        if(produto is not null)
+        var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+
+        if(product is not null)
         {
-            produto.Active = !produto.Active;
-            await _appDbContext.SaveChangesAsync();
+            return product;
         }
 
         throw new Exception("Produto não encontrado");
     }
 
-    public async Task UpdateProduct(Guid id, CreateProductDto productDto)
+    public async Task ToogleActiveProduct(Guid id)
     {
-        var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
-
-        if (product is not null)
+        var product = await SelectProductById(id);   
+        
+        if(product is not null)
         {
-            
+            product.Active = !product.Active;
+            await _appDbContext.SaveChangesAsync();
         }
+    }
+
+    public async Task<SelectProductDto> UpdateProduct(Guid id, UpdateProductDto productDto)
+    {
+        var product = await SelectProductById(id);
+
+        product.Name = productDto.name;
+        product.Price = productDto.price;
+        product.CategoryId = productDto.categoryId;
+
+        await _appDbContext.SaveChangesAsync();
+        return _mapper.Map<SelectProductDto>(product);
+
+
     }
 }

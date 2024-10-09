@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseSqlServer(env["CONNECTION_STRING"]));
 
-
+builder.Services.AddTransient<CategoryService>();
 builder.Services.AddTransient<ProductService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

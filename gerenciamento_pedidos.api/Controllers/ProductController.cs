@@ -1,5 +1,7 @@
-﻿using gerenciamento_pedidos.api.Dtos.Product;
+﻿using AutoMapper;
+using gerenciamento_pedidos.api.Dtos.Product;
 using gerenciamento_pedidos.api.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gerenciamento_pedidos.api.Controllers;
@@ -9,19 +11,21 @@ namespace gerenciamento_pedidos.api.Controllers;
 public class ProductController: ControllerBase
 {
     private readonly ProductService _service;
+    private readonly IMapper _mapper;
 
-    public ProductController(ProductService service)
+    public ProductController(ProductService service, IMapper mapper)
     {
         _service = service;
+        _mapper = mapper;
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
     {
         
-        var result = await _service.CreateProduct(productDto);
+        await _service.CreateProduct(productDto);
         
-        return Created($"/Product/{result.name}",result);
+        return Ok("Produto criado com sucesso");
     }
 
     [HttpGet]
@@ -45,5 +49,15 @@ public class ProductController: ControllerBase
     {
         await _service.ToogleActiveProduct(id);
         return NoContent();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProduct([FromRoute] Guid id,[FromBody] UpdateProductDto productDto)
+    {
+        //TODO: Add JsonPatchDocument update
+
+        var result = await _service.UpdateProduct(id, productDto);
+        
+        return Ok(result);
     }
 }

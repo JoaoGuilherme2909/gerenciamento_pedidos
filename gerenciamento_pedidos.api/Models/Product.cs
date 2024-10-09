@@ -12,5 +12,9 @@ public class Product
     [Required]
     public bool Active { get; set; } = false;
 
+    public int? CategoryId { get; set; }
+
+    public virtual Category Category { get; set; }
+
     public virtual ICollection<Order> Orders { get; set; }
 }
