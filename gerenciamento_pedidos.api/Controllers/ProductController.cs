@@ -60,4 +60,11 @@ public class ProductController: ControllerBase
         
         return Ok(result);
     }
+
+    [HttpGet("Categoria/{categoryId}")]
+    public async Task<IActionResult> GetProductsByCategory([FromRoute] int categoryId)
+    {
+        var products = await _service.GetProductsByCategory(categoryId);
+        return Ok(products);
+    }
 }

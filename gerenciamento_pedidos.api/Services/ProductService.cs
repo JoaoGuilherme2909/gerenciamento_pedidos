@@ -11,17 +11,17 @@ namespace gerenciamento_pedidos.api.Services;
 
 public class ProductService
 {
-    private readonly AppDbContext _appDbContext;
+    private readonly AppDbContext _context;
     private readonly IMapper _mapper;
-    public ProductService(AppDbContext appDbContext, IMapper mapper)
+    public ProductService(AppDbContext context, IMapper mapper)
     {
-        _appDbContext = appDbContext;
+        _context = context;
         _mapper = mapper;
     }
 
     public async Task CreateProduct(CreateProductDto productDto)
     {
-        var produto = await _appDbContext.Products
+        var produto = await _context.Products
             .FirstOrDefaultAsync(p => 
                 p.Name.ToUpper().Equals(productDto.name)
             );
@@ -31,20 +31,20 @@ public class ProductService
             throw new Exception("Produto já existe");
         }
         
-        var produtoCriado = await _appDbContext.AddAsync(_mapper.Map<Product>(productDto));
+        var produtoCriado = await _context.AddAsync(_mapper.Map<Product>(productDto));
 
-        await _appDbContext.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 
     public async Task<ICollection<SelectProductDto>> SelectAllProducts()
     {
-        var produtos = await _appDbContext.Products.Where(p => p.Active == true).ToListAsync();
+        var produtos = await _context.Products.Where(p => p.Active == true).ToListAsync();
         return produtos.Select(p => _mapper.Map<SelectProductDto>(p)).ToList();
     }
 
     public async Task<ICollection<SelectProductDto>> SelectProductsByName(string name)
     {
-        var products = await _appDbContext.Products.Where(p => p.Name.Contains(name)).ToListAsync();
+        var products = await _context.Products.Where(p => p.Name.Contains(name)).ToListAsync();
         if(products is not null)
         {
             return products.Select(p => _mapper.Map<SelectProductDto>(p)).ToList();
@@ -56,7 +56,7 @@ public class ProductService
 
     private async Task<Product> SelectProductById(Guid id)
     {
-        var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
         if(product is not null)
         {
@@ -73,7 +73,7 @@ public class ProductService
         if(product is not null)
         {
             product.Active = !product.Active;
-            await _appDbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 
@@ -85,9 +85,18 @@ public class ProductService
         product.Price = productDto.price;
         product.CategoryId = productDto.categoryId;
 
-        await _appDbContext.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return _mapper.Map<SelectProductDto>(product);
 
 
+    }
+
+    public async Task<ICollection<SelectProductDto>> GetProductsByCategory(int categoryId)
+    {
+        var products = await _context.Products.Include(p => p.Category)
+            .Where(p => p.CategoryId == categoryId)
+            .Select(p => _mapper.Map<SelectProductDto>(p))
+            .ToListAsync();
+        return products;
     }
 }
