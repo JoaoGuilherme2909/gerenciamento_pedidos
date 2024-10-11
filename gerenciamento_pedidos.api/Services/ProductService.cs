@@ -23,7 +23,7 @@ public class ProductService
     {
         var produto = await _context.Products
             .FirstOrDefaultAsync(p => 
-                p.Name.ToUpper().Equals(productDto.name)
+                p.Name.ToUpper().Equals(productDto.name.ToUpper())
             );
 
         if (produto is not null)

@@ -8,6 +8,8 @@ public class TableProfile : Profile
 {
     public TableProfile()
     {
-        CreateMap<CreateTableDto, Category>();
+        CreateMap<CreateTableDto, Table>();
+        CreateMap<SelectTableDto, Table>();
+        CreateMap<Table, SelectTableDto>();
     }
 }

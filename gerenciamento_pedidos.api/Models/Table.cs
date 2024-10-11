@@ -8,5 +8,6 @@ public class Table
     public int Id { get; set; }
     [Required]
     public int Number {  get; set; }
+    public bool IsBusy { get; set; } = false;
     public virtual ICollection<Client> Clients { get; set; }
 }
