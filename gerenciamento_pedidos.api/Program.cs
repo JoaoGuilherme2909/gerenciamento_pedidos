@@ -20,9 +20,10 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
     .UseLazyLoadingProxies()
 );
 
-builder.Services.AddTransient<CategoryService>();
-builder.Services.AddTransient<ProductService>();
-builder.Services.AddTransient<TableService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<TableService>();
+builder.Services.AddScoped<ClientService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

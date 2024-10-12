@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using gerenciamento_pedidos.api.Dtos.Product;
+using gerenciamento_pedidos.api.Models;
 using gerenciamento_pedidos.api.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -52,11 +53,21 @@ public class ProductController: ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct([FromRoute] Guid id,[FromBody] UpdateProductDto productDto)
+    public async Task<IActionResult> UpdateProduct([FromRoute] Guid id,[FromBody] JsonPatchDocument<UpdateProductDto> patch)
     {
         //TODO: Add JsonPatchDocument update
+        var product = await _service.SelectProductById(id);
 
-        var result = await _service.UpdateProduct(id, productDto);
+        var productToUpdate = _mapper.Map<UpdateProductDto>(product);
+
+        patch.ApplyTo(productToUpdate, ModelState);
+
+        if (!TryValidateModel(productToUpdate))
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var result = await _service.UpdateProduct(id, productToUpdate);
         
         return Ok(result);
     }

@@ -14,12 +14,11 @@ public class Client
     
     public virtual Table Table { get; set; }
 
+    public bool Active { get; set; } = true;
     //Implementar posteriormente
     //public Guid UserId { get; set; }
 
     //public virtual User User { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; }
-
-
 }

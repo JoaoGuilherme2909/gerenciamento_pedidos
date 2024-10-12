@@ -54,7 +54,7 @@ public class ProductService
     
     }
 
-    private async Task<Product> SelectProductById(Guid id)
+    public async Task<Product> SelectProductById(Guid id)
     {
         var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
