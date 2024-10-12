@@ -17,13 +17,14 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 
 builder.Services.AddDbContext<AppDbContext>(opts => 
     opts.UseSqlServer(env["CONNECTION_STRING"])
-    .UseLazyLoadingProxies()
+   .UseLazyLoadingProxies()
 );
 
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<TableService>();
-builder.Services.AddScoped<ClientService>();
+builder.Services.AddTransient<CategoryService>();
+builder.Services.AddTransient<ProductService>();
+builder.Services.AddTransient<TableService>();
+builder.Services.AddTransient<ClientService>();
+builder.Services.AddTransient<OrderService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

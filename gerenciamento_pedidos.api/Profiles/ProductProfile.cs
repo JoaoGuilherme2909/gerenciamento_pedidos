@@ -10,6 +10,7 @@ public class ProductProfile: Profile
     {
         CreateMap<CreateProductDto, Product>();
         CreateMap<Product, SelectProductDto>();
+        CreateMap<Product, MiniSelectProductDto>();
         CreateMap<SelectProductDto, Product>();
         CreateMap<UpdateProductDto, Product>();
         CreateMap<Product, UpdateProductDto>();

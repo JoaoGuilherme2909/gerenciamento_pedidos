@@ -32,12 +32,17 @@ public class ClientService
 
     public async Task CreateClient(CreateClientDto clientDto)
     {
-        await _context.Clients.AddAsync(_mapper.Map<Client>(clientDto));
+        var client = _mapper.Map<Client>(clientDto);
+        await _context.Clients.AddAsync(client);
 
         var table = await _context.Tables.FirstOrDefaultAsync(t => t.Id == clientDto.tableId);
 
         table.IsBusy = true;
 
+        await _context.SaveChangesAsync();
+
+        var order = new Order() { ClientId = client.Id};
+        await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
     }
 
