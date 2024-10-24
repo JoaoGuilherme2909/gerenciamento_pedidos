@@ -30,7 +30,7 @@ public class ClientService
         return client;
     }
 
-    public async Task CreateClient(CreateClientDto clientDto)
+    public async Task<SelectClientDto> CreateClient(CreateClientDto clientDto)
     {
         var client = _mapper.Map<Client>(clientDto);
         await _context.Clients.AddAsync(client);
@@ -44,6 +44,8 @@ public class ClientService
         var order = new Order() { ClientId = client.Id};
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<SelectClientDto>(client);
     }
 
     public async Task DeleteClient(Guid id)

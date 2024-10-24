@@ -1,9 +1,11 @@
 ﻿using gerenciamento_pedidos.api.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace gerenciamento_pedidos.api.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
 
     public DbSet<Client> Clients { get; set; }
@@ -17,6 +19,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+       base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Order>()
             .HasMany(o => o.Employees)
             .WithMany(e => e.Orders);

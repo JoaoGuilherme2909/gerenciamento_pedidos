@@ -2,4 +2,4 @@
 
 namespace gerenciamento_pedidos.api.Dtos.Client;
 
-public record SelectClientDto(string name, SelectTableDto table);
+public record SelectClientDto(Guid id,string name, SelectTableDto table);

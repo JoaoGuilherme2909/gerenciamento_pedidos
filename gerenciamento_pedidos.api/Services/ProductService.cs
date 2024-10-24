@@ -19,7 +19,7 @@ public class ProductService
         _mapper = mapper;
     }
 
-    public async Task CreateProduct(CreateProductDto productDto)
+    public async Task<SelectProductDto> CreateProduct(CreateProductDto productDto)
     {
         var produto = await _context.Products
             .FirstOrDefaultAsync(p => 
@@ -30,10 +30,12 @@ public class ProductService
         {
             throw new Exception("Produto já existe");
         }
-        
-        var produtoCriado = await _context.AddAsync(_mapper.Map<Product>(productDto));
 
+        var produtoCriado = _mapper.Map<Product>(productDto);
+        await _context.AddAsync(produtoCriado);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<SelectProductDto>(produtoCriado);
     }
 
     public async Task<ICollection<SelectProductDto>> SelectAllProducts()

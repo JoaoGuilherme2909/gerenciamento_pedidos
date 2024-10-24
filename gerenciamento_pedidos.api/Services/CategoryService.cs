@@ -18,7 +18,7 @@ public class CategoryService
         _mapper = mapper;
     }
 
-    public async Task CreateCategory(CreateCategoryDto categoryDto)
+    public async Task<SelectCategoryDto> CreateCategory(CreateCategoryDto categoryDto)
     {
         var category = await GetCategoryByName(categoryDto.name);
 
@@ -27,8 +27,11 @@ public class CategoryService
             throw new Exception("Categoria já existe");
         }
 
-        await _context.Categories.AddAsync(_mapper.Map<Category>(categoryDto));
+        var createdCategoty = _mapper.Map<Category>(categoryDto);
+        await _context.Categories.AddAsync(createdCategoty);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<SelectCategoryDto>(createdCategoty);
 
     }
 

@@ -45,7 +45,7 @@ public class ProductController: ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpPut("/toggle_active_product/{id}")]
     public async Task<IActionResult> ToogleActiveProduct([FromRoute] Guid id)
     {
         await _service.ToogleActiveProduct(id);
