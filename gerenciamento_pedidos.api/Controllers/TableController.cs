@@ -2,12 +2,14 @@
 using gerenciamento_pedidos.api.Data;
 using gerenciamento_pedidos.api.Dtos.Table;
 using gerenciamento_pedidos.api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gerenciamento_pedidos.api.Controllers;
 //TODO: Finalizar crud de mesa
 [ApiController]
 [Route("[Controller]")]
+[EnableCors("Policy")]
 public class TableController : ControllerBase
 {
     private readonly TableService _service;
