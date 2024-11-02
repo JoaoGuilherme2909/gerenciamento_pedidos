@@ -1,11 +1,13 @@
 ﻿using gerenciamento_pedidos.api.Dtos.Client;
 using gerenciamento_pedidos.api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gerenciamento_pedidos.api.Controllers;
 
 [ApiController]
 [Route("[Controller]")]
+[EnableCors("Policy")]
 public class ClientController : ControllerBase
 {
     private readonly ClientService _service;

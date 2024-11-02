@@ -1,11 +1,13 @@
 ﻿using gerenciamento_pedidos.api.Dtos.Order;
 using gerenciamento_pedidos.api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gerenciamento_pedidos.api.Controllers;
 
 [ApiController]
 [Route("[Controller]")]
+[EnableCors("Policy")]
 public class OrderController : ControllerBase
 {
     private readonly OrderService _service;

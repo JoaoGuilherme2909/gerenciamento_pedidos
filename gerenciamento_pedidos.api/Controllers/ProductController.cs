@@ -2,6 +2,7 @@
 using gerenciamento_pedidos.api.Dtos.Product;
 using gerenciamento_pedidos.api.Models;
 using gerenciamento_pedidos.api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace gerenciamento_pedidos.api.Controllers;
 
 [ApiController]
 [Route("[Controller]")]
+[EnableCors("Policy")]
 public class ProductController: ControllerBase
 {
     private readonly ProductService _service;
