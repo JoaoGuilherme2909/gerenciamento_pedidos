@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gerenciamento_pedidos.api.Data;
 
-public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+public class AppDbContext : DbContext
 {
 
     public DbSet<Client> Clients { get; set; }

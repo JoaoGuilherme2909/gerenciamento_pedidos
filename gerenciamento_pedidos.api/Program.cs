@@ -26,6 +26,12 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
    .UseLazyLoadingProxies()
 );
 
+builder.Services.AddCors(opts => opts.AddPolicy("Policy", builder => 
+{
+    builder.AllowAnyHeader()
+           .AllowAnyMethod()
+           .AllowAnyOrigin();       
+}));
 
 builder.Services.AddTransient<CategoryService>();
 builder.Services.AddTransient<ProductService>();
