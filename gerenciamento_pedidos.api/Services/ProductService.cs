@@ -40,16 +40,16 @@ public class ProductService
 
     public async Task<ICollection<SelectProductDto>> SelectAllProducts()
     {
-        var produtos = await _context.Products.Where(p => p.Active == true).ToListAsync();
+        var produtos = await _context.Products.ToListAsync();
         return produtos.Select(p => _mapper.Map<SelectProductDto>(p)).ToList();
     }
 
-    public async Task<ICollection<SelectProductDto>> SelectProductsByName(string name)
+    public async Task<SelectProductDto> SelectProductsByName(string name)
     {
-        var products = await _context.Products.Where(p => p.Name.Contains(name)).ToListAsync();
-        if(products is not null)
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Name.Equals(name));
+        if(product is not null)
         {
-            return products.Select(p => _mapper.Map<SelectProductDto>(p)).ToList();
+            return _mapper.Map<SelectProductDto>(product);
         }
 
         throw new Exception("Produto não encontrado");
