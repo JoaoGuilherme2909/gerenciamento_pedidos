@@ -47,4 +47,9 @@ public class OrderService
 
         return orders;
     }
+
+    public async Task<SelectOrderDto> GetOrderByClientId(Guid id) 
+    {
+        return _mapper.Map<SelectOrderDto>(await _context.Orders.FirstOrDefaultAsync(o => o.ClientId == id && o.Client.Active == true));
+    }
 }

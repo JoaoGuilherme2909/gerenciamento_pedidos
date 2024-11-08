@@ -29,4 +29,9 @@ public class OrderController : ControllerBase
     {
         return Ok(await _service.GetAllOrders());
     }
+    [HttpGet("{clientId}")]
+    public async Task<IActionResult> GetOrderByClientId([FromRoute]Guid clientId) 
+    {
+        return Ok(await _service.GetOrderByClientId(clientId));
+    }
 }
