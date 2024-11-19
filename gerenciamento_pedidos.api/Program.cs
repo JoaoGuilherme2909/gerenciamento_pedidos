@@ -2,6 +2,7 @@ using dotenv.net;
 using gerenciamento_pedidos.api.Data;
 using gerenciamento_pedidos.api.Models;
 using gerenciamento_pedidos.api.Services;
+using identityTeste.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,14 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(opts =>
-    opts.UseSqlServer(env["CONNECTION_STRING"])
+    opts.UseSqlite("Data source=meuBancoDeDados.db")
    .UseLazyLoadingProxies()
 );
+
+builder.Services.AddIdentity<User, IdentityRole>()
+                .AddErrorDescriber<CustomIdentityErrorDescriber>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
 
 builder.Services.AddCors(opts => opts.AddPolicy("Policy", builder => 
 {
@@ -38,6 +44,7 @@ builder.Services.AddTransient<ProductService>();
 builder.Services.AddTransient<TableService>();
 builder.Services.AddTransient<ClientService>();
 builder.Services.AddTransient<OrderService>();
+builder.Services.AddTransient<TokenService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
