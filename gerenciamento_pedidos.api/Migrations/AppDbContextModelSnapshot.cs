@@ -173,21 +173,6 @@ namespace gerenciamento_pedidos.api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.Property<int>("OrdersId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ProductsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("OrdersId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("OrderProduct");
-                });
-
             modelBuilder.Entity("gerenciamento_pedidos.api.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -270,6 +255,32 @@ namespace gerenciamento_pedidos.api.Migrations
                     b.HasIndex("ClientId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("gerenciamento_pedidos.api.Models.OrderProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsFinish")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProduct");
                 });
 
             modelBuilder.Entity("gerenciamento_pedidos.api.Models.Product", b =>
@@ -452,21 +463,6 @@ namespace gerenciamento_pedidos.api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.HasOne("gerenciamento_pedidos.api.Models.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("gerenciamento_pedidos.api.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("gerenciamento_pedidos.api.Models.Client", b =>
                 {
                     b.HasOne("gerenciamento_pedidos.api.Models.Table", "Table")
@@ -489,6 +485,25 @@ namespace gerenciamento_pedidos.api.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("gerenciamento_pedidos.api.Models.OrderProduct", b =>
+                {
+                    b.HasOne("gerenciamento_pedidos.api.Models.Order", "Order")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("gerenciamento_pedidos.api.Models.Product", "Product")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("gerenciamento_pedidos.api.Models.Product", b =>
                 {
                     b.HasOne("gerenciamento_pedidos.api.Models.Category", "Category")
@@ -506,6 +521,16 @@ namespace gerenciamento_pedidos.api.Migrations
             modelBuilder.Entity("gerenciamento_pedidos.api.Models.Client", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("gerenciamento_pedidos.api.Models.Order", b =>
+                {
+                    b.Navigation("OrderProducts");
+                });
+
+            modelBuilder.Entity("gerenciamento_pedidos.api.Models.Product", b =>
+                {
+                    b.Navigation("OrderProducts");
                 });
 
             modelBuilder.Entity("gerenciamento_pedidos.api.Models.Table", b =>

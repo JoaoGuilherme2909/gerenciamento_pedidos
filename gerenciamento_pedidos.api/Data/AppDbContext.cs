@@ -19,14 +19,20 @@ public class AppDbContext : IdentityDbContext<User>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-       base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Order>()
-            .HasMany(o => o.Employees)
-            .WithMany(e => e.Orders);
+        modelBuilder.Entity<OrderProduct>()
+            .HasKey(op => op.Id);
 
-        modelBuilder.Entity<Order>()
-            .HasMany(o => o.Products)
-            .WithMany(p => p.Orders);
+        modelBuilder.Entity<OrderProduct>()
+            .HasOne(op => op.Order)
+            .WithMany(o => o.OrderProducts)
+            .HasForeignKey(op => op.OrderId);
+
+        modelBuilder.Entity<OrderProduct>()
+            .HasOne(op => op.Product)
+            .WithMany(p => p.OrderProducts)
+            .HasForeignKey(op => op.ProductId);
     }
+
 }

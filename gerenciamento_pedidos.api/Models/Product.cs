@@ -15,6 +15,7 @@ public class Product
     public int? CategoryId { get; set; }
 
     public virtual Category Category { get; set; }
+    public virtual ICollection<OrderProduct> OrderProducts { get; set; }
 
-    public virtual ICollection<Order> Orders { get; set; }
+
 }

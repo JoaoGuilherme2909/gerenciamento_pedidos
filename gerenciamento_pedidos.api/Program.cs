@@ -3,7 +3,6 @@ using gerenciamento_pedidos.api.Data;
 using gerenciamento_pedidos.api.Models;
 using gerenciamento_pedidos.api.Services;
 using identityTeste.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

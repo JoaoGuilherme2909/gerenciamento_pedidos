@@ -34,4 +34,10 @@ public class OrderController : ControllerBase
     {
         return Ok(await _service.GetOrderByClientId(clientId));
     }
+
+    [HttpGet("/kitchen")]
+    public async Task<IActionResult> GetAllOrdersKitchen()
+    {
+        return Ok(await _service.GetAllOrdersKitchen());
+    }
 }

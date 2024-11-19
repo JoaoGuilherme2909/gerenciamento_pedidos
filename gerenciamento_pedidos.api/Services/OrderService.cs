@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using gerenciamento_pedidos.api.Data;
+using gerenciamento_pedidos.api.Dtos.Kitchen;
 using gerenciamento_pedidos.api.Dtos.Order;
 using gerenciamento_pedidos.api.Dtos.Product;
 using gerenciamento_pedidos.api.Models;
@@ -18,35 +19,94 @@ public class OrderService
         _mapper = mapper;
     }
 
-    public async Task<ICollection<MiniSelectProductDto>> CreateOrder(CreateOrderDto createOrderDto) 
+    public async Task<ICollection<MiniSelectProductDto>> CreateOrder(CreateOrderDto createOrderDto)
     {
-        var order = await _context.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == createOrderDto.id);
+
+        var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == createOrderDto.id);
+
+        if (order == null)
+        {
+            throw new Exception("Pedido não encontrado.");
+        }
+
 
         var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == createOrderDto.productId);
 
-        if (product == null) 
+        if (product == null)
         {
             throw new Exception("Produto não encontrado.");
         }
 
-        order.Products.Add(product);
- 
-        var orderCreated = _mapper.Map<SelectOrderDto>(order);
+
+        var orderProduct = new OrderProduct
+        {
+            OrderId = order.Id,
+            ProductId = product.Id,
+            IsFinish = false 
+        };
+
+        _context.Set<OrderProduct>().Add(orderProduct);
+
         await _context.SaveChangesAsync();
 
-        return orderCreated.products;
+
+        var orderCreated = await _context.Orders
+                                          .Include(o => o.OrderProducts)
+                                          .ThenInclude(op => op.Product)
+                                          .Where(o => o.Id == order.Id)
+                                          .Select(o => _mapper.Map<SelectOrderDto>(o))
+                                          .FirstOrDefaultAsync();
+
+        return orderCreated?.products;
     }
 
-    public async Task<ICollection<SelectOrderDto>> GetAllOrders() 
+    public async Task<ICollection<SelectOrderDto>> GetAllOrders()
     {
         var orders = await _context.Orders.AsNoTracking()
-                                          .Include(o => o.Products)
+                                          .Include(o => o.OrderProducts)
+                                          .ThenInclude(op => op.Product)
                                           .Where(o => o.paid == false)
                                           .Select(o => _mapper.Map<SelectOrderDto>(o))
                                           .ToListAsync();
 
         return orders;
     }
+
+    public async Task<ICollection<OrderDto>> GetAllOrdersKitchen()
+    {
+        var orders = await _context.Orders.AsNoTracking()
+                                          .Where(o => o.paid == false && o.OrderProducts.Any(op => op.IsFinish == false))
+                                          .Select(o => new OrderDto
+                                          {
+                                              Id = o.Id,
+                                              Client = new ClientDto
+                                              {
+                                                  Id = o.Client.Id,
+                                                  Table = o.Client.Table.Number.ToString(),
+                                                  Name = o.Client.Name
+                                              },
+                                              CreatedAt = o.CreatedAt,
+                                              UpdatedAt = o.UpdatedAt,
+                                              OrderProducts = o.OrderProducts
+                                                               .Where(op => op.IsFinish == false)
+                                                               .Select(op => new OrderProductDto
+                                                               {
+                                                                   ProductId = op.ProductId,
+                                                                   IsFinish = op.IsFinish,
+                                                                   Product = new ProductDto
+                                                                   {
+                                                                       Id = op.Product.Id,
+                                                                       Name = op.Product.Name,
+                                                                       Price = op.Product.Price
+                                                                   }
+                                                               }).ToList()
+                                          })
+                                          .ToListAsync();
+
+        return orders;
+    }
+
+
 
     public async Task<SelectOrderDto> GetOrderByClientId(Guid id) 
     {
