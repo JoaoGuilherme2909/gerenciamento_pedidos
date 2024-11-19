@@ -23,7 +23,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(opts =>
-    opts.UseSqlite("Data source=meuBancoDeDados.db")
+    opts.UseSqlServer(env["CONNECTION_STRING"])
    .UseLazyLoadingProxies()
 );
 
