@@ -40,4 +40,22 @@ public class OrderController : ControllerBase
     {
         return Ok(await _service.GetAllOrdersKitchen());
     }
+
+    [HttpPut("/kitchen/{id}")]
+    public async Task<IActionResult> GetAllOrdersKitchen([FromRoute] int id)
+    {
+        try
+        {
+            await _service.FinishDish(id);
+            return Ok("Pedido finalizado com sucesso");
+        }
+        catch (KeyNotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
+        }
+    }
 }

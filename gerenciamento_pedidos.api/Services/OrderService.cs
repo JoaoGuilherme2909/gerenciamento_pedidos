@@ -60,13 +60,38 @@ public class OrderService
         return orderCreated?.products;
     }
 
-    public async Task<ICollection<SelectOrderDto>> GetAllOrders()
+    public async Task<ICollection<OrderDto>> GetAllOrders()
     {
         var orders = await _context.Orders.AsNoTracking()
                                           .Include(o => o.OrderProducts)
                                           .ThenInclude(op => op.Product)
                                           .Where(o => o.paid == false)
-                                          .Select(o => _mapper.Map<SelectOrderDto>(o))
+                                          .Select(o => new OrderDto
+                                          {
+                                              Id = o.Id,
+                                              Client = new ClientDto
+                                              {
+                                                  Id = o.Client.Id,
+                                                  Table = o.Client.Table.Number.ToString(),
+                                                  Name = o.Client.Name
+                                              },
+                                              CreatedAt = o.CreatedAt,
+                                              UpdatedAt = o.UpdatedAt,
+                                              OrderProducts = o.OrderProducts
+                                                               .Where(op => op.IsFinish == false)
+                                                               .Select(op => new OrderProductDto
+                                                               {
+                                                                   id = op.Id,
+                                                                   ProductId = op.ProductId,
+                                                                   IsFinish = op.IsFinish,
+                                                                   Product = new ProductDto
+                                                                   {
+                                                                       Id = op.Product.Id,
+                                                                       Name = op.Product.Name,
+                                                                       Price = op.Product.Price
+                                                                   }
+                                                               }).ToList()
+                                          })
                                           .ToListAsync();
 
         return orders;
@@ -91,6 +116,7 @@ public class OrderService
                                                                .Where(op => op.IsFinish == false)
                                                                .Select(op => new OrderProductDto
                                                                {
+                                                                   id = op.Id,
                                                                    ProductId = op.ProductId,
                                                                    IsFinish = op.IsFinish,
                                                                    Product = new ProductDto
@@ -107,6 +133,28 @@ public class OrderService
     }
 
 
+    public async Task FinishDish(int orderProductId)
+    {
+        var order = await _context.Orders
+                                  .Include(o => o.OrderProducts) 
+                                  .FirstOrDefaultAsync(o => o.OrderProducts.Any(op => op.Id == orderProductId));
+
+        if (order == null)
+        {
+            throw new KeyNotFoundException("Pedido não encontrado.");
+        }
+
+        var orderProduct = order.OrderProducts.FirstOrDefault(op => op.Id == orderProductId);
+
+        if (orderProduct == null)
+        {
+            throw new KeyNotFoundException("Produto não encontrado no pedido.");
+        }
+
+        orderProduct.IsFinish = !orderProduct.IsFinish;
+
+        await _context.SaveChangesAsync();
+    }
 
     public async Task<SelectOrderDto> GetOrderByClientId(Guid id) 
     {
